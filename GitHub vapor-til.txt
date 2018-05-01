@@ -1,0 +1,18 @@
+GitHub vapor-til
+
+Quick setup — if you’ve done this kind of thing before
+ Set up in Desktop	or	
+HTTPS  https://github.com/cr-sullivan/vapor-til.git
+SSH  git@github.com:cr-sullivan/vapor-til.git
+	
+We recommend every repository include a README, LICENSE, and .gitignore.
+…or create a new repository on the command line
+ echo "# vapor-til" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cr-sullivan/vapor-til.git
+git push -u origin master
+…or push an existing repository from the command line
+ git remote add origin https://github.com/cr-sullivan/vapor-til.git
+git push -u origin master
