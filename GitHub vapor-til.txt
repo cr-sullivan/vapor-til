@@ -1,6 +1,7 @@
 GitHub vapor-til
 
 https://github.com/cr-sullivan/vapor-til
+https://crs-til.vapor.cloud
 
 Quick setup — if you’ve done this kind of thing before
  Set up in Desktop	or	
