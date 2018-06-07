@@ -16,6 +16,22 @@ public func routes(_ router: Router) throws {
                 return acronym.save(on: req)
         }
     }
+    
+    router.get("api", "acronyms") { req -> Future<[Acronym]> in
+        return Acronym.query(on: req).all()
+    }
+    
+    router.put("api", "acronyms", Acronym.parameter) {
+        req -> Future<Acronym> in
+        return try flatMap(to: Acronym.self,
+                           req.parameters.next(Acronym.self),
+                           req.content.decode(Acronym.self)) {
+                            acronym, updatedAcronym in
+                            acronym.short = updatedAcronym.short
+                            acronym.long = updatedAcronym.long
+                            return acronym.save(on: req)
+        }
+    }
 
 }
 
