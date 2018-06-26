@@ -27,31 +27,47 @@
 /// THE SOFTWARE.
 
 import Vapor
+import Leaf
 
-struct UsersController: RouteCollection {
+struct WebsiteController: RouteCollection {
   func boot(router: Router) throws {
-    let usersRoute = router.grouped("api", "users")
-    usersRoute.post(User.self, use: createHandler)
-    usersRoute.get(use: getAllHandler)
-    usersRoute.get(User.parameter, use: getHandler)
-    usersRoute.get(User.parameter, "acronyms", use: getAcronymsHandler)
+    router.get(use: indexHandler)
+    router.get("acronyms", Acronym.parameter, use: acronymHandler)
   }
-
-  func createHandler(_ req: Request, user: User) throws -> Future<User> {
-    return user.save(on: req)
-  }
-
-  func getAllHandler(_ req: Request) throws -> Future<[User]> {
-    return User.query(on: req).all()
-  }
-
-  func getHandler(_ req: Request) throws -> Future<User> {
-    return try req.parameters.next(User.self)
-  }
-
-  func getAcronymsHandler(_ req: Request) throws -> Future<[Acronym]> {
-    return try req.parameters.next(User.self).flatMap(to: [Acronym].self) { user in
-      try user.acronyms.query(on: req).all()
+  
+  func indexHandler(_ req: Request) throws -> Future<View> {
+    return Acronym.query(on: req)
+      .all()
+      .flatMap(to: View.self) { acronyms in
+        let acronymsData = acronyms.isEmpty ? nil : acronyms
+        let context = IndexContext(title: "Homepage",
+                                   acronyms: acronymsData)
+        return try req.view().render("index", context)
     }
   }
+
+  func acronymHandler(_ req: Request) throws -> Future<View> {
+    return try req.parameters.next(Acronym.self)
+      .flatMap(to: View.self) { acronym in
+        return try acronym.user
+          .get(on: req)
+          .flatMap(to: View.self) { user in
+            let context = AcronymContext(title: acronym.short,
+                                         acronym: acronym,
+                                         user: user)
+            return try req.view().render("acronym", context)
+        }
+    }
+  }
+}
+
+struct IndexContext: Encodable {
+  let title: String
+  let acronyms: [Acronym]?
+}
+
+struct AcronymContext: Encodable {
+  let title: String
+  let acronym: Acronym
+  let user: User
 }
